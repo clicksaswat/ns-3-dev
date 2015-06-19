@@ -313,6 +313,23 @@ ArpCache::Add (Ipv4Address to)
   return entry;
 }
 
+void
+ArpCache::Remove (ArpCache::Entry *entry)
+{
+  NS_LOG_FUNCTION (this << entry);
+  
+  for (CacheI i = m_arpCache.begin (); i != m_arpCache.end (); i++)
+    {
+      if ((*i).second == entry)
+        {
+          m_arpCache.erase (i);
+          entry->ClearPendingPacket (); //clear the pending packets for entry's ipaddress
+          delete entry;
+          return;
+        }
+    }
+}
+
 ArpCache::Entry::Entry (ArpCache *arp)
   : m_arp (arp),
     m_state (ALIVE),
@@ -451,6 +468,12 @@ ArpCache::Entry::DequeuePending (void)
       m_pending.pop_front ();
       return p;
     }
+}
+void 
+ArpCache::Entry::ClearPendingPacket (void)
+{
+  NS_LOG_FUNCTION (this);
+  m_pending.clear ();
 }
 void 
 ArpCache::Entry::UpdateSeen (void)

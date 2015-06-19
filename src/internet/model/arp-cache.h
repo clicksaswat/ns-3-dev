@@ -114,7 +114,7 @@ public:
    */
   Time GetAliveTimeout (void) const;
   /**
-   * \brief Get the time the entry will be in DEAD state before being removed
+   * \brief Get the time the entrygi will be in DEAD state before being removed
    * \returns the Dead state timeout
    */
   Time GetDeadTimeout (void) const;
@@ -150,6 +150,11 @@ public:
    * \brief Add an Ipv4Address to this ARP cache
    */
   ArpCache::Entry *Add (Ipv4Address to);
+  /**
+   * \brief Remove an entry.
+   * \param entry pointer to delete it from the list
+   */
+  void Remove (ArpCache::Entry *entry);
   /**
    * \brief Clear the ArpCache of all entries
    */
@@ -227,6 +232,10 @@ public:
      *            packets are pending.
      */
     Ptr<Packet> DequeuePending (void);
+    /**
+     * \brief Clear the pending packet list
+     */
+    void ClearPendingPacket (void);
     /**
      * \returns number of retries that have been sent for an ArpRequest
      *  in WaitReply state.
