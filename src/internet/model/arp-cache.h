@@ -114,7 +114,7 @@ public:
    */
   Time GetAliveTimeout (void) const;
   /**
-   * \brief Get the time the entrygi will be in DEAD state before being removed
+   * \brief Get the time the entry will be in DEAD state before being removed
    * \returns the Dead state timeout
    */
   Time GetDeadTimeout (void) const;
