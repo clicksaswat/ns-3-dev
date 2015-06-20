@@ -191,6 +191,10 @@ public:
      */
     void MarkWaitReply (Ptr<Packet> waiting);
     /**
+     * \brief Changes the the state of this entry to Permanent if it was Alive
+     */
+    void MarkPermanent (void);
+    /**
      * \param waiting
      * \return 
      */
@@ -207,10 +211,14 @@ public:
      * \return True if the state of this entry is wait_reply; false otherwise.
      */
     bool IsWaitReply (void);
-
+    /**
+     * \return True if the state of this entry is permanent; false otherwise.
+     */
+    bool IsPermanent (void); 
     /**
      * \return The MacAddress of this entry
      */
+    
     Address GetMacAddress (void) const;
     /**
      * \return The Ipv4Address for this entry
@@ -257,7 +265,8 @@ private:
     enum ArpCacheEntryState_e {
       ALIVE,
       WAIT_REPLY,
-      DEAD
+      DEAD,
+      PERMANENT
     };
 
     /**
