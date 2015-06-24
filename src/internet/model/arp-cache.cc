@@ -328,6 +328,7 @@ ArpCache::Remove (ArpCache::Entry *entry)
           return;
         }
     }
+  NS_LOG_WARN ("Entry not found in this ARP Cache");
 }
 
 ArpCache::Entry::Entry (ArpCache *arp)

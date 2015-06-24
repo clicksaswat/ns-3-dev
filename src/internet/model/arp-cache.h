@@ -191,7 +191,7 @@ public:
      */
     void MarkWaitReply (Ptr<Packet> waiting);
     /**
-     * \brief Changes the the state of this entry to Permanent if it was Alive
+     * \brief Changes the state of this entry to Permanent if it was Alive
      */
     void MarkPermanent (void);
     /**
