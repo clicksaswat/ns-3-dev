@@ -4,11 +4,13 @@
 #define NEIGHBOR_TABLE_HELPER_H_
 
 #include <stdint.h>
+#include <string>
 #include <map>
 #include "ns3/node.h"
 #include "ns3/ptr.h"
 #include "ns3/ipv4-interface.h"
 #include "ns3/ipv4-address.h"
+#include "ns3/output-stream-wrapper.h"
 #include "ns3/address.h"
 
 
@@ -25,7 +27,14 @@ public:
   ArpCacheHelper (void);
 
   /**
-   * \brief Destroy the NeighborTableHelper
+   * \brief Constructor
+   *
+   * \param node pointer to the node for which ArpCacheHelper will be constructed.
+   */
+  ArpCacheHelper (Ptr<Node> node);
+
+  /**
+   * \brief Destroy the ArpCacheHelper
    */
   virtual ~ArpCacheHelper (void);
 
@@ -35,34 +44,35 @@ public:
    * \param pointer to the node for which helper object will be created.
    */
 
-  void Initiate (Ptr<Node> node);
+  void Setup (Ptr<Node> node);
 
   /**
-   * \brief Retrieve the index-th Ipv4Interface associated with this node.
-   *
-   * \param index the index of the requested Ipv4Interface
-   * \returns the requested Ipv4Interface.
+   * \brief Update the database of ArpCacheHelper. Use this function if you've added
+   * 		new Ipv4Interface to the Node or modified ArpCache associated with existing Ipv4Interface.
    */
-  Ptr<Ipv4Interface> GetInterface (uint32_t index) const;
-
-  /**
-   * \returns the number of Ipv4Interfaces associated with this node.
-   */
-  uint32_t GetNInterfaces (void) const;
+  void Update (void);
 
   /**
    * \brief Print all the ArpCache Entries associated with the Ipv4Interface
    *
    * \param ipv4Interface pointer to the Ipv4Interface of which entries will be printed.
+   * \param the ostream to which entries will be printed
    */
+  void PrintEntries (Ptr<Ipv4Interface> ipv4interface, Ptr<OutputStreamWrapper> stream) const;
 
-
-  void PrintEntries (Ptr<Ipv4Interface> ipv4interface) const;
+  /**
+   * \brief Print all the ArpCache Entries associated with the Ipv4Interface
+   * 		corresponding to the index value
+   *
+   * \param index index of Ipv4Interface on the Node
+   * \param stream the ostream to which entries will be printed
+   */
+  void PrintEntries (uint32_t index, Ptr<OutputStreamWrapper> stream) const;
 
   /**
    * \brief Print all the ArpCache entries associated with the Node.
    */
-  void PrintEntriesAll (void) const;
+  void PrintEntriesAll (Ptr<OutputStreamWrapper> stream) const;
 
   /**
    * \brief Add an Entry to the ArpCache of Ipv4Interface
@@ -71,6 +81,14 @@ public:
    * \param entry pointer to a Entry object. Can be obtained using MakeEntry();
    */
   void AddEntry (Ptr<Ipv4Interface> ipv4interface, Ptr<ArpCache::Entry> entry) const;
+
+  /**
+   * \brief Add an Entry to the ArpCache of Ipv4Interface corresponding to the index value
+   *
+   * \param index index of the Ipv4Interface on the node
+   * \param entry pointer to a Entry object. Can be obtained using MakeEntry()
+   */
+  void AddEntry (uint32_t index, Ptr<ArpCache::Entry> entry) const;
 
   /**
    * \brief Make an Entry object using the parameters passed
@@ -82,41 +100,59 @@ public:
    *
    * \returns pointer to the newly created Entry.
    */
-  Ptr<ArpCache::Entry> MakeEntry (Ipv4Address ipv4Address, Address macAddress = null, char *state = "ALIVE" ) const;
+  Ptr<ArpCache::Entry> MakeEntry (Ipv4Address ipv4Address, Address macAddress, std::string status = "ALIVE") const;
 
   /**
-   * \brief Get an Entry object associated with the Ipv4Address of the ipv4Interface
+   * \brief Get an Entry object associated with the Ipv4Address of the Ipv4Interface
    *
    * \param ipv4Interface the Ipv4Interface where the Entry will be looked upon
    * \param ipv4Address the Ipv4Address of the ArpCache Entry
    *
    * \returns pointer to the Entry object if found, returns 0 otherwise
    */
-  Ptr<ArpCache::Entry> GetEntry (Ipv4Interface ipv4Interface, Ipv4Address ipv4Address) const;
+  Ptr<ArpCache::Entry> GetEntry (Ptr<Ipv4Interface> ipv4Interface, Ipv4Address ipv4Address) const;
 
   /**
-   * \brief Remove the Entry corresponding to Ipv4Address from the Ipv4Interface
+   * \brief Get an Entry object associated with the Ipv4Address of the Ipv4Interface corresponding to the index value
    *
-   * \param ipv4Interface the Ipv4Interfce from which Entry will be removed
-   * \param ipv4Addrss the Ipv4Address of the Entry to be removed
+   * \param index index of the Ipv4Interface on the node.
+   * \param	ipv4Address the Ipv4Address of the ArpCache Entry
+   */
+  Ptr<ArpCache::Entry> GetEntry (uint32_t index, Ipv4Address ipv4Address) const;
+
+  /**
+   * \brief Remove the Entry from the Ipv4Interface
+   *
+   * \param ipv4Interface the Ipv4Interface from which corresponding entry will be removed
+   * \param entry the ArpCache Entry to be removed, the pointer to the entry can
+   * 			  be obtained using GetEntry() method
    *
    */
-  void RemoveEntry (Ipv4Interface ipv4Interface, Ipv4Address ipv4Address) const;
+  void RemoveEntry (Ptr<Ipv4Interface> ipv4Interface, Ptr<ArpCache::Entry> entry) const;
+
+  /**
+   * \brief Remove the Entry from the Ipv4Interface corresponding to the index value
+   *
+   * \param index index of the Ipv4Interface on the Node
+   * \param entry the ArpCache Entry to be remvoed, the pointer to the entry can be
+   * 			  obtianed using GetEntry() method
+   */
+  void RemoveEntry (uint32_t index, Ptr<ArpCache::Entry> entry) const;
 
   /**
    * \brief Change the status of a Entry.
    *
-   * \param entry pointer to the Entry of which status is to be changed. Can be obtained using the GetEntry() method.
+   * \param entry pointer to the Entry of which status is to be changed. Can be obtained using the GetEntry() method
    * \param status a string representing the status. Possible values:  "ALIVE", "WAIT_REPLY", "DEAD", "PERMANENT"
    *
    */
-  void ChangeEntryStatus (Ptr<ArpCache::Entry> entry, char *status) const;
+  void ChangeEntryStatus (Ptr<ArpCache::Entry> entry, std::string status) const;
 
   /**
    * \brief Change the MAC Address of the Entry.
    *
-   * \param entry pointer to the Entry of which MAC address is to be changed. Can be obtained using the GetEntry() method.
-   * \parma macAddress the new value of MAC Address which the Entry will point to.
+   * \param entry pointer to the Entry of which MAC address is to be changed. Can be obtained using the GetEntry() method
+   * \param macAddress the new value of MAC Address which the Entry will point to
    */
   void ChangeEntryAddress (Ptr<ArpCache::Entry> entry, Address macAddress) const;
 
