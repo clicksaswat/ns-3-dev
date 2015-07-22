@@ -146,6 +146,12 @@ public:
    * \return An ArpCache::Entry with info about layer 2
    */
   ArpCache::Entry *Lookup (Ipv4Address destination);
+
+  /**
+   * \brief Add an Entry object to this ARP cache
+   */
+  void Add (ArpCache::Entry *entry);
+
   /**
    * \brief Add an Ipv4Address to this ARP cache
    */
@@ -172,6 +178,11 @@ public:
    */
   class Entry {
 public:
+	/**
+	 * \brief Constructor
+	 */
+	Entry ();
+
     /**
      * \brief Constructor
      * \param arp The ArpCache this entry belongs to
@@ -224,6 +235,10 @@ public:
      * \return The Ipv4Address for this entry
      */
     Ipv4Address GetIpv4Address (void) const;
+    /**
+     * \param macAddress The MacAddress for this entry
+     */
+    void SetMacAddress (Address macAddress);
     /**
      * \param destination The Ipv4Address for this entry
      */

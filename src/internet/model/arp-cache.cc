@@ -301,6 +301,22 @@ ArpCache::Lookup (Ipv4Address to)
   return 0;
 }
 
+void
+ArpCache::Add (ArpCache::Entry *entry)
+{
+  NS_LOG_FUNCTION (this << entry);
+  //Look for existing entry object with same Ipv4 Address
+  if (m_arpCache.find (entry->GetIpv4Address ()) == m_arpCache.end ())
+  	{
+	  m_arpCache[entry->GetIpv4Address ()] = entry;
+  	}
+  else
+    {
+	  NS_LOG_WARN ("Overriding Entry object associated with existing Ipv4Address");
+	  m_arpCache[entry->GetIpv4Address ()] = entry;
+    }
+}
+
 ArpCache::Entry *
 ArpCache::Add (Ipv4Address to)
 {
@@ -329,6 +345,13 @@ ArpCache::Remove (ArpCache::Entry *entry)
         }
     }
   NS_LOG_WARN ("Entry not found in this ARP Cache");
+}
+
+ArpCache::Entry::Entry ()
+  : m_state (ALIVE),
+	m_retries (0)
+{
+	NS_LOG_FUNCTION (this);
 }
 
 ArpCache::Entry::Entry (ArpCache *arp)
@@ -434,6 +457,12 @@ ArpCache::Entry::GetIpv4Address (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_ipv4Address;
+}
+void
+ArpCache::Entry::SetMacAddress (Address macAddress)
+{
+	NS_LOG_FUNCTION (this << macAddress);
+	m_macAddress = macAddress;
 }
 void 
 ArpCache::Entry::SetIpv4Address (Ipv4Address destination)
