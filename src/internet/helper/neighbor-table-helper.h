@@ -164,9 +164,4 @@ private:
   ArpCacheList m_arpCacheList;
 };
 
-}
-
-
-
-
 #endif /* NEIGHBOR_TABLE_HELPER_H_ */

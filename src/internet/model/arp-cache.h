@@ -178,10 +178,10 @@ public:
    */
   class Entry {
 public:
-	/**
-	 * \brief Constructor
-	 */
-	Entry ();
+    /**
+     * \brief Constructor
+     */
+    Entry ();
 
     /**
      * \brief Constructor
@@ -235,6 +235,10 @@ public:
      * \return The Ipv4Address for this entry
      */
     Ipv4Address GetIpv4Address (void) const;
+    /**
+     * \param arp Pointer to a ArpCache that this entry is associated with.
+     */
+    void SetArpCache (Ptr<ArpCache> arp);
     /**
      * \param macAddress The MacAddress for this entry
      */

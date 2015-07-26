@@ -96,19 +96,26 @@ ArpCacheHelper::PrintEntriesAll (Ptr<OutputStreamWrapper> stream) const
 void
 ArpCacheHelper::AddEntry (Ptr<Ipv4Interface> ipv4Interface, Ptr<ArpCache::Entry> entry) const
 {
-  //TO-DO have to modify the ArpCache class to provide this function
+  Ptr<ArpCache> arpCache = m_arpCacheList[ipv4Interface];
+  entry->SetArpCache (arpCache);
 }
 
 void
 ArpCacheHelper::AddEntry (uint32_t index, Ptr<ArpCache::Entry> entry) const
 {
-	//TO-DO have to modify the ArpCache class to provide this function
+  Ptr<Ipv4Interface> ipv4Interface = m_node->GetObject<Ipv4L3Protocol> ()->GetInterface (index);
+  Ptr<ArpCache> arpCache = m_arpCacheList[ipv4Interface];
+  entry->SetArpCache (arpCache);
 }
 
 Ptr<ArpCache::Entry>
 ArpCacheHelper::MakeEntry (Ipv4Address ipv4Address, Address macAddress, std::string status = "ALIVE") const
 {
-  //TO-DO have to provide a constructor for Entry without any parameter.
+  ArpCache::Entry *entry = new ArpCache::Entry ();
+  entry->SetIpv4Address (ipv4Address);
+  entry->SetMacAddress (macAddress);
+  this->ChangeEntryStatus (entry, status);
+  return entry;
 }
 
 Ptr<ArpCache::Entry>
@@ -157,7 +164,7 @@ ArpCacheHelper::ChangeEntryStatus (Ptr<ArpCache::Entry> entry, std::string statu
 void
 ArpCacheHelper::ChangeEntryAddress (Ptr<ArpCache::Entry> entry, Address macAddress) const
 {
-	//TO-DO implement SetMacAddress() in ArpCache::Entry
+  entry->SetMacAddress (macAddress);
 }
 
 
