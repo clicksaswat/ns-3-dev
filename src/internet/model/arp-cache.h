@@ -198,6 +198,10 @@ public:
      */
     void MarkAlive (Address macAddress);
     /**
+     * \brief changes the state of this entry to WAIT_REPLY
+     */
+    void MarkWaitReply ();
+    /**
      * \param waiting
      */
     void MarkWaitReply (Ptr<Packet> waiting);

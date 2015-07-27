@@ -164,4 +164,30 @@ private:
   ArpCacheList m_arpCacheList;
 };
 
+class ArpStackHelper
+{
+public:
+  ArpStackHelper (void);
+
+  virtual ~ArpStackHelper (void);
+
+  /**
+   * \brief Method will send Arp Request for all the addresses in
+   * 	    its sub network and for all received responses it will
+   * 	    create PERMANENT ArpCache entries associating the
+   * 	    sub network device's IP and MAC address. It can be used
+   * 	    to pre-populate ArpCache prior sending any application
+   * 	    packets to neglect the delay arising from Arp Request/Reply.
+   *
+   * \param ipv4Interface the Ipv4Interface pointer for which ArpCache will
+   * 			 be populated.
+   */
+  void PopulateArpCache (Ptr<Ipv4Interface> interface);
+
+
+
+};
+
+}
+
 #endif /* NEIGHBOR_TABLE_HELPER_H_ */

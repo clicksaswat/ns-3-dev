@@ -422,6 +422,15 @@ ArpCache::Entry::MarkPermanent (void)
   UpdateSeen ();
 }
 void 
+ArpCache::Entry::MarkWaitReply ()
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_state == ALIVE || m_state == DEAD);
+  m_state = WAIT_REPLY;
+  UpdateSeen ();
+  m_arp->StartWaitReplyTimer ();
+}
+void
 ArpCache::Entry::MarkWaitReply (Ptr<Packet> waiting)
 {
   NS_LOG_FUNCTION (this << waiting);

@@ -128,9 +128,9 @@ ArpCacheHelper::GetEntry (Ptr<Ipv4Interface> ipv4Interface, Ipv4Address ipv4Addr
 Ptr<ArpCache::Entry>
 ArpCacheHelper::GetEntry (uint32_t index, Ipv4Address ipv4Address) const
 {
-	Ptr<Ipv4Interface> ipv4Interface = m_node-> GetObject<Ipv4L3Protocol> ()-> GetInterface (index);
-	Ptr<ArpCache> arpCache = m_arpCacheList[ipv4Interface];
-	return arpCache->Lookup (ipv4Address);
+  Ptr<Ipv4Interface> ipv4Interface = m_node-> GetObject<Ipv4L3Protocol> ()-> GetInterface (index);
+  Ptr<ArpCache> arpCache = m_arpCacheList[ipv4Interface];
+  return arpCache->Lookup (ipv4Address);
 }
 
 void
@@ -151,13 +151,13 @@ void
 ArpCacheHelper::ChangeEntryStatus (Ptr<ArpCache::Entry> entry, std::string status) const
 {
 	if (status == "ALIVE")
-		entry->MarkAlive (entry->GetMacAddress ());
+	  entry->MarkAlive (entry->GetMacAddress ());
 	else if (status == "DEAD")
-		entry->MarkDead ();
+	  entry->MarkDead ();
 	else if (status == "WAIT_REPLY")
-		entry->MarkWaitReply (entry->GetPendingPackets ()); //TO-DO Implement GetPendingPackets() in the ArpCache::Entry class
+	  entry->MarkWaitReply ();
 	else if (status == "PERMANENT")
-		entry->MarkPermanent ();
+	  entry->MarkPermanent ();
 	else NS_LOG_WARN ("Invalid Status value. Possible values \"ALIVE\", \"DEAD\", \"WAIT_REPLY\", \"PERMANENT\"");
 }
 
@@ -167,5 +167,71 @@ ArpCacheHelper::ChangeEntryAddress (Ptr<ArpCache::Entry> entry, Address macAddre
   entry->SetMacAddress (macAddress);
 }
 
+void
+ArpStackHelper::PopulateArpCache(Ptr<Ipv4Interface> interface)
+{
+  Ptr<ArpL3Protocol> arp = interface->GetObject<ArpL3Protocol> ();
+  Ptr<ArpCache> arpCache = interface->GetArpCache();
+
+  //flush the ArpCache before populating
+  arpCache->Flush ();
+
+  //Get No. of IpAddress associated with this interface
+  uint32_t nAddress = interface->GetNAddresses ();
+
+  for (int i = 0; i < nAddress; i++)
+    {
+      Ipv4InterfaceAddress ipInterface = interface->GetAddress (i);
+      Ipv4Address local = ipInterface.GetLocal ();
+      Ipv4Mask mask = ipInterface.GetMask ();
+
+      //Calculate subnet base address from local & mask
+      Ipv4Address network = local.CombineMask (mask);
+
+      //Generate an Ipv4AddressHelper which will generate all IPs in the subnet
+      Ipv4AddressHelper addressHelper = new Ipv4AddressHelper (network, mask);
+
+      //figure out max possible no. of subnet IPs for this mask
+      uint32_t maskValue = mask.Get ();
+      uint32_t maxValue = 1;
+
+      while (true)
+	{
+	  if (maskValue & 1)
+	    break;
+	  maskValue >>= 1;
+	  maxValue <<= 1;
+	}
+
+      maxValue -= 2; //Don't use network & broadcast address (all 0's & all 1's)
+
+      //send arp request for all subnet IPs
+      for (int i = 0; i < maxValue; i++)
+	{
+
+	  Ipv4Address to = addressHelper.NewAddress ();
+	  arp->SendArpRequest (arpCache, to);
+
+	  //sending Arp request will not create an entry in this cache
+	  //So, we manually add one & mark it WAIT_REPLY
+
+	  ArpCache::Entry *entry = arpCache->Add (to);
+	  entry->MarkWaitReply ();
+
+	  //TO-DO
+	  //Some devices or channels may be introducing latency during sending or receiving
+	  //Arp Request/Reply. Find a way to make sure sent packet is gone and all received
+	  //packet(if there is any) has been processed by ArpL3Protocol
+
+	  //ensured that we've got the Arp Reply (if there is any)
+	  //if Mac Address is not null we've got the reply
+	  if (entry->GetMacAddress ())
+	    entry->MarkPermanent ();
+	  else arpCache->Remove (entry);
+
+	 }
+       }
+
+}
 
 }
