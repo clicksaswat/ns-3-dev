@@ -172,19 +172,23 @@ public:
   virtual ~ArpStackHelper (void);
 
   /**
-   * \brief Method will send Arp Request for all the addresses in
-   * 	    its sub network and for all received responses it will
-   * 	    create PERMANENT ArpCache entries associating the
-   * 	    sub network device's IP and MAC address. It can be used
-   * 	    to pre-populate ArpCache prior sending any application
-   * 	    packets to neglect the delay arising from Arp Request/Reply.
+   * \brief Method will search for all the devices connected to the
+   * 	    same channel as the device associated with the interface
+   * 	    passed on as parameter. It will add permanent arp cache
+   * 	    entry for the IP addresses associated with the remote
+   * 	    devices(devices on the same channel). This method can be
+   * 	    used to pre populate Arp cache to bypass the delay arising
+   * 	    from Arp Request/Reply.
    *
    * \param ipv4Interface the Ipv4Interface pointer for which ArpCache will
    * 			 be populated.
    */
-  void PopulateArpCache (Ptr<Ipv4Interface> interface);
+   void PopulateArpCache (Ptr<Ipv4Interface> interface);
 
-
+  /**
+   * \brief
+   */
+  void PopulateArpCache (Ipv4InterfaceContainer ipContainer, NodeContainer nc);
 
 };
 
