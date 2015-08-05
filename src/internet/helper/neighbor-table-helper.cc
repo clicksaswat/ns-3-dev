@@ -174,7 +174,7 @@ ArpStackHelper::PopulateArpCache (Ptr<Ipv4Interface> interface)
   Ptr<Node> node = nd->GetNode ();
   Ptr<Channel> channel = nd->GetChannel ();
   Ptr<ArpCache> arpCache = interface->GetArpCache ();
-  uint32_t myNodeId = node->GetId ();
+
 
   //find out no. of devices connected to the same channel
   uint32_t numDevices = channel->GetNDevices ();
@@ -198,8 +198,7 @@ ArpStackHelper::PopulateArpCache (Ptr<Ipv4Interface> interface)
 	  Ipv4Mask remoteMask = remoteInterface->GetAddress (j).GetLocal ();
 
 	  //find the network or base address of host address
-	  uint32_t remoteNetworkAddress = remoteAddress.Get () & remoteMask.Get ();
-	  Ipv4Address remoteNetwork = new Ipv4Address (remoteNetworkAddress);
+	  Ipv4Address remoteNetwork = remoteAddress.CombineMask (remoteMask);
 
 	  for (int k = 0; k < numHostIp; k++)
 	    {
@@ -207,8 +206,7 @@ ArpStackHelper::PopulateArpCache (Ptr<Ipv4Interface> interface)
 	      Ipv4Mask hostMask = interface->GetAddress (k).GetMask ();
 
 	      //find the network or base address of host address
-	      uint32_t hostNetworkAddress = hostAddress.Get () & hostMask.Get ();
-	      Ipv4Address hostNetwork = new Ipv4Address (hostNetworkAddress);
+	      Ipv4Address hostNetwork = hostAddress.CombineMask (hostMask);
 
 	      //find out if remote IP Address is in the subnet of host IP Address
 	      if (remoteNetwork == hostNetwork)
