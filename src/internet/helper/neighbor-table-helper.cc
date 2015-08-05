@@ -168,7 +168,7 @@ ArpCacheHelper::ChangeEntryAddress (Ptr<ArpCache::Entry> entry, Address macAddre
 }
 
 void
-ArpStackHelper::PopulateArpCache (Ptr<Ipv4Interface> interface)
+ArpCacheHelper::PopulateArpCache (Ptr<Ipv4Interface> interface)
 {
   Ptr<NetDevice> nd = interface->GetDevice ();
   Ptr<Node> node = nd->GetNode ();

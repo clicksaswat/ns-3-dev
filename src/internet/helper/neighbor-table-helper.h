@@ -156,21 +156,6 @@ public:
    */
   void ChangeEntryAddress (Ptr<ArpCache::Entry> entry, Address macAddress) const;
 
-
-private:
-  typedef std::map<Ptr<Ipv4Interface>, Ptr<ArpCache>> ArpCacheList;
-
-  Ptr<Node> m_node;
-  ArpCacheList m_arpCacheList;
-};
-
-class ArpStackHelper
-{
-public:
-  ArpStackHelper (void);
-
-  virtual ~ArpStackHelper (void);
-
   /**
    * \brief Method will search for all the devices connected to the
    * 	    same channel as the device associated with the interface
@@ -185,12 +170,14 @@ public:
    */
    void PopulateArpCache (Ptr<Ipv4Interface> interface);
 
-  /**
-   * \brief
-   */
-  void PopulateArpCache (Ipv4InterfaceContainer ipContainer, NodeContainer nc);
 
+private:
+  typedef std::map<Ptr<Ipv4Interface>, Ptr<ArpCache>> ArpCacheList;
+
+  Ptr<Node> m_node;
+  ArpCacheList m_arpCacheList;
 };
+
 
 }
 
