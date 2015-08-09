@@ -19,96 +19,54 @@ NS_LOG_COMPONENT_DEFINE ("NeighborTableHelper");
 namespace ns3 {
 
 ArpCacheHelper::ArpCacheHelper (void)
-  : m_node (0),
-    m_arpCacheList (0)
 {
-
-}
-
-ArpCacheHelper::ArpCacheHelper (Ptr<Node> node)
-{
-  this->Setup (node);
+  NS_LOG_FUNCTION (this);
 }
 
 ArpCacheHelper::~ArpCacheHelper (void)
 {
-  delete m_arpCacheList;
-}
-
-void
-ArpCacheHelper::Setup (Ptr<Node> node)
-{
-  NS_LOG_FUNCTION (this << node);
-  //clear the previous database
-  if (!m_arpCacheList.empty())
-    {
-      NS_LOG_DEBUG ("Clearing Previous Database");
-      m_arpCacheList.clear();
-    }
-
-  //set the node of the helper object
-  m_node = node;
-
-  //extract all the Ipv4Interfaces associated with the node and add them to the database.
-  Ptr<Ipv4L3Protocol> ipv4 = node->GetObject<Ipv4L3Protocol> ();
-  uint32_t numOfInterfaces =  ipv4->GetNInterfaces ();
-
-  for (int i = 0; i < numOfInterfaces; i++)
-    {
-      Ptr<Ipv4Interface> ipv4Interface = ipv4->GetInterface (i);
-      Ptr<ArpCache> arpCache = ipv4Interface->GetArpCache ();
-      m_arpCacheList[ipv4Interface] = arpCache;
-    }
-}
-
-void
-ArpCacheHelper::Update (void)
-{
-  this->Setup (m_node);
+  NS_LOG_FUNCTION (this);
 }
 
 void
 ArpCacheHelper::PrintEntries (Ptr<Ipv4Interface> ipv4Interface, Ptr<OutputStreamWrapper> stream) const
 {
-  Ptr<ArpCache> arpCache = m_arpCacheList[ipv4Interface];
+  Ptr<ArpCache> arpCache = ipv4Interface->GetArpCache ();
   arpCache->PrintArpCache (stream);
 }
 
 void
-ArpCacheHelper::PrintEntries (uint32_t index, Ptr<OutputStreamWrapper> stream) const
+ArpCacheHelper::PrintEntries (Ptr<Node> node, uint32_t index, Ptr<OutputStreamWrapper> stream) const
 {
-  Ptr<Ipv4Interface> ipv4Interface = m_node-> GetObject<Ipv4L3Protocol> ()-> GetInterface (index);
-  Ptr<ArpCache> arpCache = m_arpCacheList[ipv4Interface];
+  Ptr<Ipv4Interface> ipv4Interface = node->GetObject<Ipv4L3Protocol> ()->GetInterface (index);
+  Ptr<ArpCache> arpCache = ipv4Interface->GetArpCache ();
   arpCache->PrintArpCache (stream);
 }
 
-
 void
-ArpCacheHelper::PrintEntriesAll (Ptr<OutputStreamWrapper> stream) const
+ArpCacheHelper::PrintEntriesAll (Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const
 {
-  for (ArpCacheList::const_iterator it = m_arpCacheList.begin(); it != m_arpCacheList.end(); it++)
-    {
-      Ptr<ArpCache> arpCache = it->second;
-      arpCache->PrintArpCache (stream);
-    }
+  uint32_t numInterface = node->GetObject<Ipv4L3Protocol> ()->GetNInterfaces ();
+  for (int i = 0; i < numInterface; i++)
+    this->PrintEntries (node, i, stream);
 }
 
 void
-ArpCacheHelper::AddEntry (Ptr<Ipv4Interface> ipv4Interface, Ptr<ArpCache::Entry> entry) const
+ArpCacheHelper::AddEntry (Ptr<Ipv4Interface> ipv4Interface, ArpCache::Entry *entry) const
 {
-  Ptr<ArpCache> arpCache = m_arpCacheList[ipv4Interface];
+  Ptr<ArpCache> arpCache = ipv4Interface->GetArpCache ();
   entry->SetArpCache (arpCache);
 }
 
 void
-ArpCacheHelper::AddEntry (uint32_t index, Ptr<ArpCache::Entry> entry) const
+ArpCacheHelper::AddEntry (Ptr<Node> node, uint32_t index, ArpCache::Entry *entry) const
 {
-  Ptr<Ipv4Interface> ipv4Interface = m_node->GetObject<Ipv4L3Protocol> ()->GetInterface (index);
-  Ptr<ArpCache> arpCache = m_arpCacheList[ipv4Interface];
+  Ptr<Ipv4Interface> ipv4Interface = node->GetObject<Ipv4L3Protocol> ()->GetInterface (index);
+  Ptr<ArpCache> arpCache = ipv4Interface->GetArpCache ();
   entry->SetArpCache (arpCache);
 }
 
-Ptr<ArpCache::Entry>
+ArpCache::Entry *
 ArpCacheHelper::MakeEntry (Ipv4Address ipv4Address, Address macAddress, std::string status = "ALIVE") const
 {
   ArpCache::Entry *entry = new ArpCache::Entry ();
@@ -118,37 +76,38 @@ ArpCacheHelper::MakeEntry (Ipv4Address ipv4Address, Address macAddress, std::str
   return entry;
 }
 
-Ptr<ArpCache::Entry>
+ArpCache::Entry *
 ArpCacheHelper::GetEntry (Ptr<Ipv4Interface> ipv4Interface, Ipv4Address ipv4Address) const
 {
-  Ptr<ArpCache> arpCache = m_arpCacheList[ipv4Interface];
+  Ptr<ArpCache> arpCache = ipv4Interface->GetArpCache ();
   return arpCache->Lookup (ipv4Address);
 }
 
-Ptr<ArpCache::Entry>
-ArpCacheHelper::GetEntry (uint32_t index, Ipv4Address ipv4Address) const
+ArpCache::Entry *
+ArpCacheHelper::GetEntry (Ptr<Node> node, uint32_t index, Ipv4Address ipv4Address) const
 {
-  Ptr<Ipv4Interface> ipv4Interface = m_node-> GetObject<Ipv4L3Protocol> ()-> GetInterface (index);
-  Ptr<ArpCache> arpCache = m_arpCacheList[ipv4Interface];
+  Ptr<Ipv4Interface> ipv4Interface = node-> GetObject<Ipv4L3Protocol> ()-> GetInterface (index);
+  Ptr<ArpCache> arpCache = ipv4Interface->GetArpCache ();
   return arpCache->Lookup (ipv4Address);
 }
 
 void
-ArpCacheHelper::RemoveEntry (Ptr<Ipv4Interface> ipv4Interface, Ptr<ArpCache::Entry> entry) const
+ArpCacheHelper::RemoveEntry (Ptr<Ipv4Interface> ipv4Interface, ArpCache::Entry *entry) const
 {
-  Ptr<ArpCache> arpCache = m_arpCacheList[ipv4Interface];
+  Ptr<ArpCache> arpCache = ipv4Interface->GetArpCache ();
   arpCache->Remove (entry);
 }
 
 void
-ArpCacheHelper::RemoveEntry (uint32_t index, Ptr<ArpCache::Entry> entry) const
+ArpCacheHelper::RemoveEntry (Ptr<Node> node, uint32_t index, ArpCache::Entry *entry) const
 {
-  Ptr<Ipv4Interface> ipv4Interface = m_node-> GetObject<Ipv4L3Protocol> ()-> GetInterface (index);
-  Ptr<ArpCache> arpCache = m_arpCacheList[ipv4Interface];
+  Ptr<Ipv4Interface> ipv4Interface = node-> GetObject<Ipv4L3Protocol> ()-> GetInterface (index);
+  Ptr<ArpCache> arpCache = ipv4Interface->GetArpCache ();
   arpCache->Remove (entry);
 }
+
 void
-ArpCacheHelper::ChangeEntryStatus (Ptr<ArpCache::Entry> entry, std::string status) const
+ArpCacheHelper::ChangeEntryStatus (ArpCache::Entry *entry, std::string status) const
 {
   if (status == "ALIVE")
     entry->MarkAlive (entry->GetMacAddress ());
@@ -162,7 +121,7 @@ ArpCacheHelper::ChangeEntryStatus (Ptr<ArpCache::Entry> entry, std::string statu
 }
 
 void
-ArpCacheHelper::ChangeEntryAddress (Ptr<ArpCache::Entry> entry, Address macAddress) const
+ArpCacheHelper::ChangeEntryAddress (ArpCache::Entry *entry, Address macAddress) const
 {
   entry->SetMacAddress (macAddress);
 }
