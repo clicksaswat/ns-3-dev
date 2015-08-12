@@ -306,7 +306,8 @@ ArpCache::Add (ArpCache::Entry *entry)
 {
   NS_LOG_FUNCTION (this << entry);
   Ipv4Address ip = entry->GetIpv4Address ();
-  NS_ASSERT_MSG (ip, "Entry object doesn't contain valid IP Address");
+  if (ip == NULL)
+    NS_LOG_ERROR("Entry object doesn't contain valid IP Address");
 
   //Look for existing entry object with same Ipv4 Address
   if (m_arpCache.find (ip) == m_arpCache.end ())
@@ -472,7 +473,7 @@ ArpCache::Entry::GetIpv4Address (void) const
   return m_ipv4Address;
 }
 void
-ArpCache::Entry::SetArpCache (Ptr<ArpCache> arp)
+ArpCache::Entry::SetArpCache (ArpCache *arp)
 {
   NS_LOG_FUNCTION (this << arp);
   m_arp = arp;

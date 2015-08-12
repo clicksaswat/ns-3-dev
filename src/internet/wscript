@@ -207,6 +207,7 @@ def build(bld):
         'model/ripng.cc',
         'model/ripng-header.cc',
         'helper/ripng-helper.cc',
+        'helper/neighbor-table-helper.cc',
         ]
 
     internet_test = bld.create_ns3_module_test_library('internet')
@@ -243,6 +244,7 @@ def build(bld):
      	'test/ipv6-address-helper-test-suite.cc',
         'test/rtt-test.cc',
         'test/codel-queue-test-suite.cc',
+        'test/arp-cache-helper-test-suite.cc',
         ]
     privateheaders = bld(features='ns3privateheader')
     privateheaders.module = 'internet'
@@ -340,6 +342,7 @@ def build(bld):
         'model/ripng.h',
         'model/ripng-header.h',
         'helper/ripng-helper.h',
+        'helper/neighbor-table-helper.h',
        ]
 
     if bld.env['NSC_ENABLED']:

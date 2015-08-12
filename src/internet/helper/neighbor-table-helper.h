@@ -12,6 +12,7 @@
 #include "ns3/ipv4-address.h"
 #include "ns3/output-stream-wrapper.h"
 #include "ns3/address.h"
+#include "ns3/arp-cache.h"
 
 
 namespace ns3 {
@@ -91,9 +92,7 @@ public:
    *
    * \returns pointer to the newly created Entry.
    */
-  ArpCache::Entry *MakeEntry (Ipv4Address ipv4Address,
-			      Address macAddress,
-		              std::string status = "ALIVE") const;
+  ArpCache::Entry *MakeEntry (Ipv4Address ipv4Address, Address macAddress, std::string status = "ALIVE") const;
 
   /**
    * \brief Get an Entry object associated with the Ipv4Address of the Ipv4Interface

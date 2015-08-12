@@ -242,7 +242,7 @@ public:
     /**
      * \param arp Pointer to a ArpCache that this entry is associated with.
      */
-    void SetArpCache (Ptr<ArpCache> arp);
+    void SetArpCache (ArpCache *arp);
     /**
      * \param macAddress The MacAddress for this entry
      */
