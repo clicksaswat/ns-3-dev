@@ -318,6 +318,13 @@ ArpL3Protocol::Lookup (Ptr<Packet> packet, Ipv4Address destination,
                   m_dropTrace (packet);
                 }
             }
+          else if (entry->IsPermanent ())
+            {
+              NS_LOG_LOGIC ("node="<<m_node->GetId ()<<
+			    ",  permanent for" << destination << "valid -- send");
+              *hardwareDestination = entry->GetMacAddress ();
+              return true;
+            }
         }
     }
   else
