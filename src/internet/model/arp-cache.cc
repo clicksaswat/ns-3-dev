@@ -282,6 +282,10 @@ ArpCache::PrintArpCache (Ptr<OutputStreamWrapper> stream)
         {
           *os << " DELAY\n";
         }
+      else if (i->second->IsPermanent ())
+	{
+	  *os << " PERMANENT\n";
+	}
       else
         {
           *os << " STALE\n";
