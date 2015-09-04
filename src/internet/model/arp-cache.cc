@@ -393,7 +393,7 @@ void
 ArpCache::Entry::MarkPermanent (void)
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_state == ALIVE);
+  NS_ASSERT (m_macAddress != 0);
   m_state = PERMANENT;
   ClearRetries ();
   UpdateSeen ();
@@ -440,6 +440,12 @@ ArpCache::Entry::GetIpv4Address (void) const
   return m_ipv4Address;
 }
 void 
+ArpCache::Entry::SetMacAddresss (Address macAddress)
+{
+  NS_LOG_FUNCTION (this);
+  m_macAddress = macAddress;
+}
+void
 ArpCache::Entry::SetIpv4Address (Ipv4Address destination)
 {
   NS_LOG_FUNCTION (this << destination);

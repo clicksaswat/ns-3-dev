@@ -225,6 +225,10 @@ public:
      */
     Ipv4Address GetIpv4Address (void) const;
     /**
+     * \param macAddress The MacAddress for this entry
+     */
+    void SetMacAddresss (Address macAddress);
+    /**
      * \param destination The Ipv4Address for this entry
      */
     void SetIpv4Address (Ipv4Address destination);
