@@ -1295,7 +1295,7 @@ bool Icmpv6L4Protocol::Lookup (Ipv6Address dst, Ptr<NetDevice> device, Ptr<Ndisc
       NdiscCache::Entry* entry = cache->Lookup (dst);
       if (entry)
         {
-          if (entry->IsReachable () || entry->IsDelay ())
+          if (entry->IsReachable () || entry->IsDelay () || entry->IsPermanent ())
             {
               *hardwareDestination = entry->GetMacAddress ();
               return true;
@@ -1329,7 +1329,7 @@ bool Icmpv6L4Protocol::Lookup (Ptr<Packet> p, Ipv6Address dst, Ptr<NetDevice> de
   NdiscCache::Entry* entry = cache->Lookup (dst);
   if (entry)
     {
-      if (entry->IsReachable () || entry->IsDelay ())
+      if (entry->IsReachable () || entry->IsDelay () || entry->IsPermanent ())
         {
           /* XXX check reachability time */
           /* send packet */
