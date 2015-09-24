@@ -506,6 +506,7 @@ void NdiscCache::Entry::MarkDelay ()
 void NdiscCache::Entry::MarkPermanent ()
 {
   NS_LOG_FUNCTION_NOARGS ();
+  StopNudTimer ();
   m_state = PERMANENT;
 }
 
