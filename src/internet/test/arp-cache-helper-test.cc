@@ -31,8 +31,8 @@ public:
   DoRun (void);
 };
 
-ArpCacheHelperTestCase::ArpCacheHelperTestCase () :
-    TestCase ("Verify the ArpCacheHelper class functionalities")
+ArpCacheHelperTestCase::ArpCacheHelperTestCase ()
+  : TestCase ("Verify the ArpCacheHelper class functionalities")
 {
 
 }
@@ -71,20 +71,32 @@ ArpCacheHelperTestCase::DoRun (void)
   Ptr<Ipv4Interface> hostInterface = host->GetObject<Ipv4L3Protocol> ()->GetInterface (index);
 
   ArpCacheHelper arp;
+
+  //Currently, there doesn't exist any way to know the size of Arp Cache Table
+  //So, we'll check individual IP entry for all the devices and confirm its existance
+
   //check for arp entries present for all IPs of the devices associated
   //with the channel should return false
-  uint32_t remoteAddressValue = 0x0A010101;
+
+
+  uint32_t remoteAddressValue = 0x0A010101; //this way of addressing IP address looks ugly
+					    //check if there exists any better way.
   for (int i = 0; i < 9; i++)
     {
       Ipv4Address remoteAddress (remoteAddressValue);
       ArpCache::Entry* entry = arp.GetEntry (hostInterface, remoteAddress);
-      NS_TEST_EXPECT_MSG_EQ (entry, 0, "No Entry corresponding to IP" + remoteAddress + "shoud exist" );
+      NS_TEST_EXPECT_MSG_EQ (entry, 0, "No Entry corresponding to IP" + remoteAddress + "should exist" );
       remoteAddressValue++;
     }
 
-  remoteAddressValue = 0x0A010101;
+
   //this will populate arp cache entries associated with all devices on channel
   arp.PopulateArpCache (hostInterface);
+
+  //Now that all entry must have been populated
+  //check if they exist in the Neighbor Table
+
+  remoteAddressValue = 0x0A010101;
   for (int i = 0; i < 9; i++)
     {
       Ipv4Address remoteAddress (remoteAddressValue);
@@ -92,21 +104,31 @@ ArpCacheHelperTestCase::DoRun (void)
       NS_TEST_EXPECT_MSG_EQ (!entry, 0, "Entry Corresponding to IP" + remoteAddress + "should exist");
     }
 
-
+  //Remove an entry
   ArpCache::Entry *entry = arp.GetEntry (hostInterface, "10.1.1.9");
   arp.RemoveEntry (hostInterface, entry);
+  entry = arp.GetEntry (hostInterface, "10.1.1.9");
+  NS_TEST_EXPECT_MSG_EQ (entry, 0, "Entry corresponding to IP 10.1.1.9 removed successfully");
 
-
-
+  //We'll ping to 10.1.1.9
+  //which will generate an Arp Entry for corresponding IP
   V4PingHelper ping ("10.1.1.9");
-  ping.SetAttribute ("Interval", TimeValue (Seconds (5.0)));
-  ApplicationContainer pingApp = ping.Install (host);
+  ApplicationContainer pingApps = ping.Install (host);
+  Ptr<Application> hostPingApp = pingApps.Get (0);
 
-  //get the ping app for the host node
-  V4Ping *hostApp = dynamic_cast<V4Ping*>(GetPointer(pingApp.Get (0)));
-  //send an ping to the node 10.1.1.9
-  hostApp->Send();
-  //after pinging host arpcache should be having an entry for 10.1.1.9
+  //Start and stop the ping app on the host node
+  //instead of setting start and stop time we may
+  //directly call the pingApps send method. But, that
+  //will be little clumsy
+  hostPingApp->SetStartTime (Seconds (1));;
+  hostPingApp->SetStopTime (Seconds (2));
+
+
+  //Now, we must have an neighbor table entry corresponding
+  //to 10.1.1.9
+  entry = arp.GetEntry (hostInterface, "10.1.1.9");
+  NS_TEST_EXPECT_MSG_EQ (entry, false, "Entry corresponding to 10.1.1.9 exists");
+
 
 
 
