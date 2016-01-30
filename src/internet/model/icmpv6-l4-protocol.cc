@@ -401,7 +401,7 @@ void Icmpv6L4Protocol::ReceiveLLA (Icmpv6OptionLinkLayerAddress lla, Ipv6Address
             }
           else
             {
-              if (!entry->IsReachable ())
+              if (!entry->IsReachable () || !entry->IsPermanent ())
                 {
                   entry->StopNudTimer ();
                   waiting = entry->MarkReachable (lla.GetAddress ());
@@ -708,7 +708,7 @@ void Icmpv6L4Protocol::HandleNA (Ptr<Packet> packet, Ipv6Address const &src, Ipv
 
               if (naHeader.GetFlagS ())
                 {
-                  if (!entry->IsReachable ())
+                  if (!entry->IsReachable () || !entry->IsPermanent ())
                     {
                       if (entry->IsProbe ())
                         {
@@ -1295,7 +1295,7 @@ bool Icmpv6L4Protocol::Lookup (Ipv6Address dst, Ptr<NetDevice> device, Ptr<Ndisc
       NdiscCache::Entry* entry = cache->Lookup (dst);
       if (entry)
         {
-          if (entry->IsReachable () || entry->IsDelay ())
+          if (entry->IsReachable () || entry->IsDelay () || entry->IsPermanent ())
             {
               *hardwareDestination = entry->GetMacAddress ();
               return true;
@@ -1329,7 +1329,7 @@ bool Icmpv6L4Protocol::Lookup (Ptr<Packet> p, Ipv6Address dst, Ptr<NetDevice> de
   NdiscCache::Entry* entry = cache->Lookup (dst);
   if (entry)
     {
-      if (entry->IsReachable () || entry->IsDelay ())
+      if (entry->IsReachable () || entry->IsDelay () || entry->IsPermanent ())
         {
           /* XXX check reachability time */
           /* send packet */

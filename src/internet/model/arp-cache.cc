@@ -282,6 +282,10 @@ ArpCache::PrintArpCache (Ptr<OutputStreamWrapper> stream)
         {
           *os << " DELAY\n";
         }
+      else if (i->second->IsPermanent ())
+	{
+	  *os << " PERMANENT\n";
+	}
       else
         {
           *os << " STALE\n";
@@ -418,6 +422,7 @@ ArpCache::Entry::MarkPermanent (void)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (m_state == ALIVE);
+  NS_ASSERT (m_macAddress != 0);
   m_state = PERMANENT;
   ClearRetries ();
   UpdateSeen ();
