@@ -60,10 +60,14 @@ ArpCacheHelperTestCase::DoRun (void)
   InternetStackHelper stack;
   stack.Install (nodes);
 
-  Ipv4AddressHelper address;
-  address.SetBase ("10.1.1.0", "255.255.255.0");
+  Ipv4AddressHelper address ("10.1.1.0", "255.255.255.0");
 
   Ipv4InterfaceContainer interfaces = address.Assign (devices);
+
+
+  //TODO: Check if we've a better way to get the Ipv4Interface object
+
+
   //Get the Ipv4 object associated with the first node.
   Ptr<Ipv4> hostIp = interfaces.Get (0).first;
   //Get the interface object associated with the CSMA devices
@@ -73,20 +77,17 @@ ArpCacheHelperTestCase::DoRun (void)
   ArpCacheHelper arp;
 
   //Currently, there doesn't exist any way to know the size of Arp Cache Table
-  //So, we'll check individual IP entry for all the devices and confirm its existance
+  //So, we'll check individual IP entry for all the devices and confirm its existence
 
   //check for arp entries present for all IPs of the devices associated
   //with the channel should return false
 
-
-  uint32_t remoteAddressValue = 0x0A010101; //this way of addressing IP address looks ugly
-					    //check if there exists any better way.
+  address.SetBase ("10.1.1.0", "255.255.255.0");
   for (int i = 0; i < 9; i++)
     {
-      Ipv4Address remoteAddress (remoteAddressValue);
+      Ipv4Address remoteAddress = address.NewAddress ();
       ArpCache::Entry* entry = arp.GetEntry (hostInterface, remoteAddress);
-      NS_TEST_EXPECT_MSG_EQ (entry, 0, "No Entry corresponding to IP" + remoteAddress + "should exist" );
-      remoteAddressValue++;
+      NS_TEST_EXPECT_MSG_EQ (entry, false, "No Entry corresponding to IP" + remoteAddress + "should exist" );
     }
 
 
@@ -96,10 +97,10 @@ ArpCacheHelperTestCase::DoRun (void)
   //Now that all entry must have been populated
   //check if they exist in the Neighbor Table
 
-  remoteAddressValue = 0x0A010101;
+  address.SetBase ("10.1.1.0", "255.255.255.0");
   for (int i = 0; i < 9; i++)
     {
-      Ipv4Address remoteAddress (remoteAddressValue);
+      Ipv4Address remoteAddress = address.NewAddress ();
       ArpCache::Entry *entry = arp.GetEntry (hostInterface, remoteAddress);
       NS_TEST_EXPECT_MSG_EQ (!entry, 0, "Entry Corresponding to IP" + remoteAddress + "should exist");
     }
@@ -128,6 +129,8 @@ ArpCacheHelperTestCase::DoRun (void)
   //to 10.1.1.9
   entry = arp.GetEntry (hostInterface, "10.1.1.9");
   NS_TEST_EXPECT_MSG_EQ (entry, false, "Entry corresponding to 10.1.1.9 exists");
+
+  //TODO: Find out ways to test ArpCacheHelper::ChangeEntryStatus as ArpCacheHelper::ChangeEntryAdress
 
 
 
