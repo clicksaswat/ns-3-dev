@@ -64,12 +64,8 @@ ArpCacheHelperTestCase::DoRun (void)
 
   Ipv4InterfaceContainer interfaces = address.Assign (devices);
 
-
-  //TODO: Check if we've a better way to get the Ipv4Interface object
-
-
   //Get the Ipv4 object associated with the first node.
-  Ptr<Ipv4> hostIp = interfaces.Get (0).first;
+  Ptr<Ipv4> hostIp = hostDevice->GetObject<Ipv4> ();
   //Get the interface object associated with the CSMA devices
   uint32_t index = hostIp->GetInterfaceForDevice (hostDevice);
   Ptr<Ipv4Interface> hostInterface = host->GetObject<Ipv4L3Protocol> ()->GetInterface (index);
