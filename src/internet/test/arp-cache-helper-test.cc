@@ -76,7 +76,7 @@ ArpCacheHelperTestCase::DoRun (void)
   //So, we'll check individual IP entry for all the devices and confirm its existence
 
   //check for arp entries present for all IPs of the devices associated
-  //with the channel should return false
+  //with the channel should return false because no packet has been transmitted yet
 
   address.SetBase ("10.1.1.0", "255.255.255.0");
   for (int i = 0; i < 9; i++)
@@ -98,14 +98,14 @@ ArpCacheHelperTestCase::DoRun (void)
     {
       Ipv4Address remoteAddress = address.NewAddress ();
       ArpCache::Entry *entry = arp.GetEntry (hostInterface, remoteAddress);
-      NS_TEST_EXPECT_MSG_EQ (!entry, 0, "Entry Corresponding to IP" + remoteAddress + "should exist");
+      NS_TEST_EXPECT_MSG_EQ (entry, true, "Entry Corresponding to IP" + remoteAddress + "should exist");
     }
 
   //Remove an entry
   ArpCache::Entry *entry = arp.GetEntry (hostInterface, "10.1.1.9");
   arp.RemoveEntry (hostInterface, entry);
   entry = arp.GetEntry (hostInterface, "10.1.1.9");
-  NS_TEST_EXPECT_MSG_EQ (entry, 0, "Entry corresponding to IP 10.1.1.9 removed successfully");
+  NS_TEST_EXPECT_MSG_EQ (entry, false, "Entry corresponding to IP 10.1.1.9 removed successfully");
 
   //We'll ping to 10.1.1.9
   //which will generate an Arp Entry for corresponding IP
@@ -124,7 +124,7 @@ ArpCacheHelperTestCase::DoRun (void)
   //Now, we must have an neighbor table entry corresponding
   //to 10.1.1.9
   entry = arp.GetEntry (hostInterface, "10.1.1.9");
-  NS_TEST_EXPECT_MSG_EQ (entry, false, "Entry corresponding to 10.1.1.9 exists");
+  NS_TEST_EXPECT_MSG_EQ (entry, true, "Entry corresponding to 10.1.1.9 exists");
 
   //TODO: Find out ways to test ArpCacheHelper::ChangeEntryStatus as ArpCacheHelper::ChangeEntryAdress
 
