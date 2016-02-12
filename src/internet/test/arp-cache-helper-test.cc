@@ -68,8 +68,12 @@ ArpCacheHelperTestCase::DoRun (void)
   Ptr<Ipv4> hostIp = hostDevice->GetObject<Ipv4> ();
   //Get the interface object associated with the CSMA devices
   uint32_t index = hostIp->GetInterfaceForDevice (hostDevice);
+  //Get the interface object associated with the host
   Ptr<Ipv4Interface> hostInterface = host->GetObject<Ipv4L3Protocol> ()->GetInterface (index);
+  //Get the arpcache object associated with the host
+  Ptr<ArpCache> arpCache = host->GetObject<ArpCache> ();
 
+  //Create the helper object
   ArpCacheHelper arp;
 
   //Currently, there doesn't exist any way to know the size of Arp Cache Table
@@ -82,7 +86,7 @@ ArpCacheHelperTestCase::DoRun (void)
   for (int i = 0; i < 9; i++)
     {
       Ipv4Address remoteAddress = address.NewAddress ();
-      ArpCache::Entry* entry = arp.GetEntry (hostInterface, remoteAddress);
+      ArpCache::Entry* entry = arpCache->Lookup (remoteAddress);
       NS_TEST_EXPECT_MSG_EQ (entry, false, "No Entry corresponding to IP" + remoteAddress + "should exist" );
     }
 
@@ -97,11 +101,11 @@ ArpCacheHelperTestCase::DoRun (void)
   for (int i = 0; i < 9; i++)
     {
       Ipv4Address remoteAddress = address.NewAddress ();
-      ArpCache::Entry *entry = arp.GetEntry (hostInterface, remoteAddress);
+      ArpCache::Entry *entry = arpCache->Lookup (remoteAddress);
       NS_TEST_EXPECT_MSG_EQ (entry, true, "Entry Corresponding to IP" + remoteAddress + "should exist");
     }
 
-  //Remove an entry
+  //Use RemoveEntry and GetEntry Methods
   ArpCache::Entry *entry = arp.GetEntry (hostInterface, "10.1.1.9");
   arp.RemoveEntry (hostInterface, entry);
   entry = arp.GetEntry (hostInterface, "10.1.1.9");
@@ -120,17 +124,9 @@ ArpCacheHelperTestCase::DoRun (void)
   hostPingApp->SetStartTime (Seconds (1));;
   hostPingApp->SetStopTime (Seconds (2));
 
+  Simulator::Start ();
 
-  //Now, we must have an neighbor table entry corresponding
-  //to 10.1.1.9
-  entry = arp.GetEntry (hostInterface, "10.1.1.9");
+  entry = arpCache->Lookup (Ipv4Address ("10.1.1.9"));
   NS_TEST_EXPECT_MSG_EQ (entry, true, "Entry corresponding to 10.1.1.9 exists");
-
-  //TODO: Find out ways to test ArpCacheHelper::ChangeEntryStatus as ArpCacheHelper::ChangeEntryAdress
-
-
-
-
   Simulator::Destroy ();
-
 }
