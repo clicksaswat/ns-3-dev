@@ -412,7 +412,10 @@ void Icmpv6L4Protocol::ReceiveLLA (Icmpv6OptionLinkLayerAddress lla, Ipv6Address
                           cache->GetInterface ()->Send (*it, src);
                         }
                     }
-                  entry->StartReachableTimer ();
+                  if (!entry->IsPermanent)
+                    {
+                      entry->StartReachableTimer ();
+                    }
                 }
             }
         }
@@ -724,7 +727,10 @@ void Icmpv6L4Protocol::HandleNA (Ptr<Packet> packet, Ipv6Address const &src, Ipv
                           entry->MarkReachable (lla.GetAddress ());
                         }
                     }
-                  entry->StartReachableTimer ();
+                  if (!entry->IsPermanent ())
+                    {
+                      entry->StartReachableTimer ();
+                    }
                 }
               else if (lla.GetAddress () != entry->GetMacAddress ())
                 {
