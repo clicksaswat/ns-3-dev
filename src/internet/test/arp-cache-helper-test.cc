@@ -71,7 +71,7 @@ ArpCacheHelperTestCase::DoRun (void)
   //Get the interface object associated with the host
   Ptr<Ipv4Interface> hostInterface = host->GetObject<Ipv4L3Protocol> ()->GetInterface (index);
   //Get the arpcache object associated with the host
-  Ptr<ArpCache> arpCache = host->GetObject<ArpCache> ();
+  Ptr<ArpCache> arpCache = hostInterface->GetArpCache ();
 
   //Create the helper object
   ArpCacheHelper arp;
@@ -124,7 +124,7 @@ ArpCacheHelperTestCase::DoRun (void)
   hostPingApp->SetStartTime (Seconds (1));;
   hostPingApp->SetStopTime (Seconds (2));
 
-  Simulator::Start ();
+  Simulator::Run ();
 
   entry = arpCache->Lookup (Ipv4Address ("10.1.1.9"));
   NS_TEST_EXPECT_MSG_EQ (entry, true, "Entry corresponding to 10.1.1.9 exists");
