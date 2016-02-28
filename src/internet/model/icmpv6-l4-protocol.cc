@@ -412,7 +412,7 @@ void Icmpv6L4Protocol::ReceiveLLA (Icmpv6OptionLinkLayerAddress lla, Ipv6Address
                           cache->GetInterface ()->Send (*it, src);
                         }
                     }
-                  if (!entry->IsPermanent)
+                  if (!entry->IsPermanent ())
                     {
                       entry->StartReachableTimer ();
                     }

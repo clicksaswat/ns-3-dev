@@ -175,10 +175,12 @@ ArpCacheHelper::PopulateArpCache (Ptr<Ipv4Interface> interface)
 	      //find out if remote IP Address is in the subnet of host IP Address
 	      if (remoteNetwork == hostNetwork)
 		{
-		  ArpCache::Entry* entry = new ArpCache::Entry (PeekPointer (arpCache));
+		  ArpCache::Entry* entry = new ArpCache::Entry ();
+		  entry->SetArpCache (PeekPointer (arpCache));
 		  entry->SetIpv4Address (remoteAddress);
 		  entry->SetMacAddress (remote->GetAddress ());
 		  entry->MarkPermanent ();
+		  arpCache->Add (entry);
 		}
 	    }
 	}

@@ -310,18 +310,16 @@ ArpCache::Add (ArpCache::Entry *entry)
 {
   NS_LOG_FUNCTION (this << entry);
   Ipv4Address ip = entry->GetIpv4Address ();
-  if (ip == NULL)
-    NS_LOG_ERROR("Entry object doesn't contain valid IP Address");
 
   //Look for existing entry object with same Ipv4 Address
   if (m_arpCache.find (ip) == m_arpCache.end ())
     {
-      m_arpCache[entry->GetIpv4Address ()] = entry;
+      m_arpCache[ip] = entry;
     }
   else
     {
       NS_LOG_WARN ("Overriding Entry object associated with existing Ipv4Address");
-      m_arpCache[entry->GetIpv4Address ()] = entry;
+      m_arpCache[ip] = entry;
     }
 }
 
@@ -422,7 +420,7 @@ ArpCache::Entry::MarkPermanent (void)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (m_state == ALIVE);
-  NS_ASSERT (m_macAddress != 0);
+  NS_ASSERT (!m_macAddress.IsInvalid ());
   m_state = PERMANENT;
   ClearRetries ();
   UpdateSeen ();
