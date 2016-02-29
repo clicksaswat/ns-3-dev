@@ -113,12 +113,11 @@ ArpCacheHelperTestCase::DoRun (void)
   Ipv4Address remoteAddress("10.1.1.1");
   for (int i = 0; i < 9; i++)
     {
+      //increase remote address value by 1 i.e change from 10.1.1.1 to 10.1.1.2 and so on
       remoteAddress.Set (remoteAddress.Get () + 1);
       ArpCache::Entry* entry = arpCache->Lookup (remoteAddress);
       NS_TEST_EXPECT_MSG_EQ (entry, (void *) NULL, "No Entry corresponding to IP " << remoteAddress << "should exist" );
     }
-
-  std::cout << "out of first loop" << std::endl;
 
   //this will populate arp cache entries associated with all devices on channel
   arp.PopulateArpCache (hostInterface);
@@ -129,6 +128,7 @@ ArpCacheHelperTestCase::DoRun (void)
   remoteAddress.Set ("10.1.1.1");
   for (int i = 0; i < 9; i++)
     {
+      //increase remote address value by 1 i.e change from 10.1.1.1 to 10.1.1.2 and so on
       remoteAddress.Set (remoteAddress.Get () + 1);
       ArpCache::Entry *entry = arpCache->Lookup (remoteAddress);
       std::cout << entry << std::endl;
